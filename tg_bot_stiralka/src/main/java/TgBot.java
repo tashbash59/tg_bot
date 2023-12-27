@@ -126,6 +126,34 @@ public class TgBot extends TelegramLongPollingBot {
 
     }
 
+    public void deleteDateById(Integer o_id) {
+
+        try {
+            String requestUrl = "http://localhost:8000/order/deleteOrder/" + o_id;
+
+            URL url = new URL(requestUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Устанавливаем метод запроса (GET, POST и т.д.)
+            connection.setRequestMethod("DELETE");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+            // Включаем возможность отправки данных в тело запроса
+            connection.setDoOutput(false);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+
+
+
+            connection.disconnect();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
     public void setUser(String username) {
         try {
             String requestUrl = "http://localhost:8000/user/getUser/" + username;
@@ -272,11 +300,10 @@ public class TgBot extends TelegramLongPollingBot {
         for (int i = 0; i < 24; i++) {
             if (!blockedTime.contains(from) && !result.contains(from)) {
                 if (after < 10) {
-                    text.append(index).append(") ").append("0").append(from).append(":00-")
+                    text.append("0").append(from).append(":00-")
                             .append("0").append(after).append(":00 \n");
                 } else {
-                    text.append(index).append(") ")
-                            .append(from).append(":00-").append(after).append(":00 \n");
+                    text.append(from).append(":00-").append(after).append(":00 \n");
                 }
                 index++;
             }
@@ -475,6 +502,7 @@ public class TgBot extends TelegramLongPollingBot {
         return -1;
     }
 
+
     public Integer hhtpPostData(String d) {
         try {
             String requestUrl = "http://localhost:8000/order/postDate/";
@@ -629,6 +657,8 @@ public class TgBot extends TelegramLongPollingBot {
             } else if (isDeleteOrderForUser == 2) {
                 //admin.deleteUsersOrder(message,orderDate,orderTime,message.getText());
                 Integer id = admin.getUserId();
+                Integer order_id = admin.hhtpGetDataId(message, id.toString());
+                deleteDateById(order_id);
                 isDeleteOrderForUser = 0;
                 sendMessage.setText("Записи этого пользователя удалены");
             }

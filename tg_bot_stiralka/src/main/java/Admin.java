@@ -74,6 +74,48 @@ public class Admin {
 
         return sendMessage;
     }
+
+    public Integer hhtpGetDataId(Message message, String us) {
+        try {
+            String requestUrl = "http://localhost:8000/order/getOrderId";
+            String d = orderDate.get(Integer.parseInt(message.getText())-1);
+
+            URL url = new URL(requestUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Устанавливаем метод запроса (GET, POST и т.д.)
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+
+            // Включаем возможность отправки данных в тело запроса
+            connection.setDoOutput(true);
+            try (OutputStream os = connection.getOutputStream()) {
+                // Дано: данные, которые нужно отправить в теле запроса
+                String data = "{\"user_id\":" + us + ",\"date\":\""+ d +"\"}";
+                // Записать данные в выходной поток
+                os.write(data.getBytes());
+            }
+
+
+            // Получаем ответ от сервера
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            connection.disconnect();
+            return Integer.parseInt(response.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     private Integer hhtpGetUserId(String user) {
         try {
             String requestUrl = "http://localhost:8000/user/getUserById";
